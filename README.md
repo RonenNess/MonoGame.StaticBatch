@@ -13,6 +13,11 @@ The class will divide your scene into a grid of render targets, and will draw al
 
 When drawing the static batch, instead of drawing all the individual sprites (lots of draw calls!) it will only draw a small subset of the static textures grid.
 
+The following screenshot illustrates a static batch with textures sized 512x512. There are also lots of sprites outside of screen, not rendered. As you can see with static batch we only need 9 draw calls!
+
+![How It Works](Assets/example1.jpg "How It Works")
+
+
 ## Advantages
 
 When drawing lots of sprites, using the static batch boost performance significantly. More specifically, you enjoy the following benefits:
