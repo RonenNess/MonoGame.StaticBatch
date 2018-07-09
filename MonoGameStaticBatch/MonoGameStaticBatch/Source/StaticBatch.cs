@@ -1,5 +1,5 @@
 ﻿/// <summary>
-/// Utility to render static grid of sprites.
+/// A utility to render a static batch of sprites.
 /// Author: Ronen Ness.
 /// Since: 2018.
 /// </summary>
@@ -17,28 +17,39 @@ namespace MonoGame.StaticBatch
     public delegate void BeginBatchHandler(SpriteBatch batch);
 
     /// <summary>
-    /// A utility to render static grid of render targets.
+    /// A utility to render static batch of sprites.
     /// 
     /// - Why:
-    /// To optimize rendering things like tilemaps and other scenes made from lots of static objects.
+    /// To optimize rendering levels with lots of static sprites, like tilemaps.
     /// 
     /// - How it works:
-    /// This class divide the screen into a grid of constant size render targets (textures). 
-    /// You can then draw on the render targets to update them, and when you draw the grid itself you can provide a rect
-    /// representing camera position and screen size, and it will only render the visible textures.
-    /// Note: it only create render targets for parts that have something to draw on.
+    /// This class convert the static sprites into a grid of render targets.
+    /// No matter how many sprites you draw, you will end up with a constant small amount of textures (depending on
+    /// screen size and batch chunk size) that will only draw when visible.
     /// 
-    /// How to use:
-    /// 1. Call AddSprite() to add renders to grid.
-    /// 2. Call Build() to create the grid itself.
-    /// 3. Call Draw() to draw the grid on spritebatch.
-    /// Some hints:
-    ///  - When building the grid, you can either release the list of sprites to free some memory, or keep so you can make changes and rebuild.
+    /// - Advantages:
+    ///     1. Reduce draw calls.
+    ///     2. Don't waste time on hidden pixels.
+    ///     3. Add tile-based culling to draw only the visible parts.
+    /// 
+    /// - Caveats:
+    ///     1. Require sprites to be static in order to remain efficient.
+    ///     2. Takes up more memory (depending on how many textures you end up using).
+    /// 
+    /// - How to use:
+    ///     1. Call AddSprite() to add your sprites to batch.
+    ///     2. Call Build() to build the batch textures.
+    ///     3. Call Draw() to draw the static batch.
+    ///     
+    /// - Hints:
+    ///     1. When building the grid, you can either release the list of sprites to free some memory, or keep so you can make changes and rebuild.
+    ///     2. To add a sprite after build simply use AddSprite() / Build() again, but without the clear flag.
+    ///     3. If you must remove an existing sprite, you'll need to clear the texture(s) containing it and redraw all related sprites.
     /// </summary>
     public class StaticBatch
     {
         /// <summary>
-        /// Static Sprite you can draw on the grid.
+        /// A static Sprite you can draw on the static batch.
         /// </summary>
         public class StaticSprite
         {
@@ -98,7 +109,7 @@ namespace MonoGame.StaticBatch
             public Rectangle BoundingRect { get; private set; }
 
             /// <summary>
-            /// Create the sprite to draw on the static grid.
+            /// Create the sprite to draw on the static batch.
             /// </summary>
             /// <param name="texture">Texture to draw.</param>
             /// <param name="dest">Destination rect.</param>
@@ -134,9 +145,9 @@ namespace MonoGame.StaticBatch
         }
 
         /// <summary>
-        /// Single texture in grid + its metadata.
+        /// A single texture in the static batch + its metadata.
         /// </summary>
-        protected class GridTexture
+        protected class StaticBatchTexture
         {
             /// <summary>
             /// The render target itself.
@@ -149,21 +160,21 @@ namespace MonoGame.StaticBatch
             public Rectangle DestRect { get; private set; }
 
             /// <summary>
-            /// Create the grid texture chunk.
+            /// Create the batch texture chunk.
             /// </summary>
             /// <param name="device">Graphic device.</param>
             /// <param name="index">Index in grid.</param>
             /// <param name="size">Texture size.</param>
-            public GridTexture(GraphicsDevice device, Point index, Point size)
+            public StaticBatchTexture(GraphicsDevice device, Point index, Point size)
             {
                 Texture = new RenderTarget2D(device, size.X, size.Y);
                 DestRect = new Rectangle(index * size, size);
             }
 
             /// <summary>
-            /// Clear grid texture.
+            /// Clear batch texture.
             /// </summary>
-            ~GridTexture()
+            ~StaticBatchTexture()
             {
                 Texture.Dispose();
             }
@@ -180,29 +191,29 @@ namespace MonoGame.StaticBatch
         private GraphicsDevice _device;
 
         /// <summary>
-        /// Default sorting mode when building or drawing the static grid.
+        /// Default sorting mode when building or drawing the static batch.
         /// </summary>
         public SpriteSortMode DefaultSortMode = SpriteSortMode.FrontToBack;
 
         /// <summary>
-        /// Default sampler state to use when building or drawing the static grid.
+        /// Default sampler state to use when building or drawing the static batch.
         /// </summary>
         public SamplerState DefaultSamplerState = SamplerState.PointClamp;
 
         /// <summary>
-        /// Default blend state to use when building or drawing the static grid.
+        /// Default blend state to use when building or drawing the static batch.
         /// </summary>
         public BlendState DefaultBlend = BlendState.AlphaBlend;
 
         /// <summary>
-        /// Size, in pixels, of a single render target in grid.
+        /// Size, in pixels, of a single render target in textures grid.
         /// </summary>
         private Point _chunkSize;
 
         /// <summary>
         /// Grid of textures.
         /// </summary>
-        Dictionary<Point, GridTexture> _textures;
+        Dictionary<Point, StaticBatchTexture> _textures;
 
         /// <summary>
         /// Current sprites waiting to be built on grid.
@@ -210,26 +221,26 @@ namespace MonoGame.StaticBatch
         List<StaticSprite> _spritesPending;
 
         /// <summary>
-        /// Create the grid.
+        /// Create the static batch.
         /// </summary>
         /// <param name="chunksSize">Size, in pixels, of a single render target.</param>
         public StaticBatch(GraphicsDevice device, Point chunksSize)
         {
             _chunkSize = chunksSize;
-            _textures = new Dictionary<Point, GridTexture>();
+            _textures = new Dictionary<Point, StaticBatchTexture>();
             _spritesPending = new List<StaticSprite>();
             _device = device;
         }
 
         /// <summary>
-        /// Render the visible grid parts on a given spritebatch.
+        /// Render the visible batch parts on a given spritebatch.
         /// </summary>
         /// <param name="batch">Spritebatch to render on.</param>
         /// <param name="viewport">If provided, will only draw parts inside the rectangle boundaries. 
         /// If null, will draw all visible textures. Use this to represent camera / visible viewport.</param>
         /// <param name="beginAndEnd">If true, will call Begin batch before drawing parts, and call End when done. 
         /// Set to false if you want to begin drawing yourself with different params.</param>
-        /// <param name="offset">Optional offset to draw grid (useful for basic camera).</param>
+        /// <param name="offset">Optional offset to draw batch (useful for basic camera).</param>
         public void Draw(SpriteBatch batch, Rectangle? viewport = null, bool beginAndEnd = true, Point? offset = null)
         {
             // zero draws count
@@ -258,7 +269,7 @@ namespace MonoGame.StaticBatch
 
                 // draw visible parts
                 Point currIndex = new Point();
-                GridTexture currTex;
+                StaticBatchTexture currTex;
                 for (currIndex.X = startIndex.X; currIndex.X <= endIndex.X + 1; ++currIndex.X)
                 {
                     for (currIndex.Y = startIndex.Y; currIndex.Y <= endIndex.Y + 1; ++currIndex.Y)
@@ -283,7 +294,7 @@ namespace MonoGame.StaticBatch
         /// </summary>
         /// <param name="batch">Spritebatch to draw on. Expected to be after 'Begin' was called.</param>
         /// <param name="texture">The grid texture itself.</param>
-        protected void DrawGridTexture(SpriteBatch batch, GridTexture texture, Point? offset)
+        protected void DrawGridTexture(SpriteBatch batch, StaticBatchTexture texture, Point? offset)
         {
             // draw with offset
             if (offset.HasValue)
@@ -307,7 +318,7 @@ namespace MonoGame.StaticBatch
         /// </summary>
         public void Clear()
         {
-            _textures = new Dictionary<Point, GridTexture>();
+            _textures = new Dictionary<Point, StaticBatchTexture>();
         }
 
         /// <summary>
@@ -320,7 +331,7 @@ namespace MonoGame.StaticBatch
         }
 
         /// <summary>
-        /// Add sprite to draw on the static grid.
+        /// Add sprite to draw on the static batch.
         /// </summary>
         /// <param name="sprite">Sprite to add to grid.</param>
         public void AddSprite(StaticSprite sprite)
@@ -329,7 +340,7 @@ namespace MonoGame.StaticBatch
         }
 
         /// <summary>
-        /// Add range of sprites to draw on the static grid.
+        /// Add range of sprites to draw on the static batch.
         /// </summary>
         /// <param name="sprites">Enumerable of sprites.</param>
         public void AddSprites(IEnumerable<StaticSprite> sprites)
@@ -338,11 +349,11 @@ namespace MonoGame.StaticBatch
         }
 
         /// <summary>
-        /// Build the grid from the list of sprites you previously added.
+        /// Build the static batch from the list of sprites previously added to it.
         /// </summary>
         /// <param name="batch">Spritebatch to use for rendering.</param>
         /// <param name="clear">If true, will clear previous textures first. If false, will redraw on them.</param>
-        /// <param name="releaseSpritesList">If true, will clear the current list of sprites after done building grid.</param>
+        /// <param name="releaseSpritesList">If true, will clear the current list of sprites after done building batch.</param>
         /// <param name="beginBatchHandler">If provided, this function will be called every time we need to begin a drawing batch. 
         /// This provides the ability to choose how to begin the drawing batch, and add your own params and flags to it.</param>
         public void Build(SpriteBatch batch, bool clear = true, bool releaseSpritesList = true, BeginBatchHandler beginBatchHandler = null)
@@ -381,10 +392,10 @@ namespace MonoGame.StaticBatch
             foreach (var indexAndSprite in sortedSprites)
             {
                 // get current grid texture
-                GridTexture currTexture;
+                StaticBatchTexture currTexture;
                 if (!_textures.TryGetValue(indexAndSprite.Key, out currTexture))
                 {
-                    _textures[indexAndSprite.Key] = currTexture = new GridTexture(_device, indexAndSprite.Key, _chunkSize);
+                    _textures[indexAndSprite.Key] = currTexture = new StaticBatchTexture(_device, indexAndSprite.Key, _chunkSize);
                 }
 
                 // begin drawing batch
