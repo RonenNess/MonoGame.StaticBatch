@@ -109,7 +109,11 @@ staticBatch.AddSprites(new StaticBatch.StaticSprite(texture, destRect, srcRect, 
 staticBatch.Build(spriteBatch, clear: false);
 ```
 
-# Demo
+## Example
+
+To see a working example please check out the [Tester code](https://github.com/RonenNess/MonoGame.StaticBatch/blob/master/MonoGameStaticBatch/MonoGameStaticBatch/TestStaticBatch.cs).
+
+# Demo / Test
 
 To watch a live demo of the static batch, clone this repo and Build & Run the project as Window / Console application.
 
