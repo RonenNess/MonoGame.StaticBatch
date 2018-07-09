@@ -8,7 +8,7 @@ Helper class to batch together static sprites and boost performance.
 `MonoGame.StaticBatch` allow you to batch together multiple static sprites, to reduce significantly their drawing times (and drawing calls).
 As an added bonus, it also add grid-based culling to skip sprites that are not currently visible in screen.
 
-**A test scene showed improvement from 10-300 FPS* without static batch to 6000+ FPS with static batch.**
+#### A test scene showed improvement from 10-300 FPS* without static batch to 6000+ FPS with static batch.
 
 *10 FPS when drawing all scene, 300 when drawing only what's in screen.
 
