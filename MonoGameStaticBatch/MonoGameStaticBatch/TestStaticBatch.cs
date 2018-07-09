@@ -134,7 +134,8 @@ namespace MonoGame.StaticBatch
                 var posx = rand.Next(LevelSize);
                 var posy = rand.Next(LevelSize);
                 _sprites.Add(new StaticBatch.StaticSprite(skeletonTexture,
-                        new Rectangle(posx, posy, 32, 32), zindex: (float)(posy + 32) / (float)(LevelSize) + posx / 1000000f));
+                        new Rectangle(posx, posy, 32, 32), zindex: (float)(posy + 32) / (float)(LevelSize) + posx / 1000000f,
+                        color: rand.Next(5) < 1 ? Color.Red : Color.White));
             }
 
             // add random trees
