@@ -1,8 +1,6 @@
-﻿/// <summary>
-/// Test the static batch utility.
-/// Author: Ronen Ness.
-/// Since: 2018.
-/// </summary>
+﻿// Test the static batch utility.
+// Author: Ronen Ness.
+// Since: 2018.
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -21,18 +19,26 @@ namespace MonoGame.StaticBatch
         /// <summary>
         /// Different rendering modes.
         /// </summary>
-        public enum DemoRenderMode
+        private enum DemoRenderMode
         {
-            // draw level using static grid
+            /// <summary>
+            /// Draw level using static grid.
+            /// </summary>
             Use_Static_Batch,
 
-            // draw all sprites without grid
+            /// <summary>
+            /// Draw all sprites without grid.
+            /// </summary>
             No_Batch_Draw_All,
 
-            // draw sprites without grid, but only the ones in screen boundaries
+            /// <summary>
+            /// Draw sprites without grid, but only the ones in screen boundaries
+            /// </summary>
             No_Batch_Only_Visible,
 
-            // to mark end of modes
+            /// <summary>
+            /// Mark end of modes rotation.
+            /// </summary>
             Invalid,
         }
 
@@ -54,6 +60,9 @@ namespace MonoGame.StaticBatch
         List<StaticBatch.StaticSprite> _sprites;
         string spritesCountStr;
 
+        /// <summary>
+        /// Create the tester.
+        /// </summary>
         public TestStaticBatch()
         {
             graphics = new GraphicsDeviceManager(this);

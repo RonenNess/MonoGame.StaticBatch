@@ -1,6 +1,6 @@
 # MonoGame.StaticBatch
 
-Helper class to batch together static sprites and boost performance
+Helper class to batch together static sprites and boost performance.
 
 
 # What Is It
@@ -11,6 +11,16 @@ As an added bonus, it also add grid-based culling to skip sprites that are not c
 **A test scene showed improvement from 10-300 FPS* without static batch to 6000+ FPS with static batch.**
 
 *10 FPS when drawing all scene, 300 when drawing only what's in screen.
+
+## Install
+
+Install via NuGet:
+
+```
+Install-Package MonoGame.StaticBatch
+```
+
+Or clone the repo and build manually.
 
 ## How It Works
 

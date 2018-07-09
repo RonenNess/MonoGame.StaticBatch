@@ -1,8 +1,6 @@
-﻿/// <summary>
-/// A utility to render a static batch of sprites.
-/// Author: Ronen Ness.
-/// Since: 2018.
-/// </summary>
+﻿// A utility to render a static batch of sprites.
+// Author: Ronen Ness.
+// Since: 2018.
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -223,6 +221,7 @@ namespace MonoGame.StaticBatch
         /// <summary>
         /// Create the static batch.
         /// </summary>
+        /// <param name="device">Graphic device.</param>
         /// <param name="chunksSize">Size, in pixels, of a single render target.</param>
         public StaticBatch(GraphicsDevice device, Point chunksSize)
         {
@@ -294,6 +293,7 @@ namespace MonoGame.StaticBatch
         /// </summary>
         /// <param name="batch">Spritebatch to draw on. Expected to be after 'Begin' was called.</param>
         /// <param name="texture">The grid texture itself.</param>
+        /// <param name="offset">Optional drawing offset.</param>
         protected void DrawGridTexture(SpriteBatch batch, StaticBatchTexture texture, Point? offset)
         {
             // draw with offset

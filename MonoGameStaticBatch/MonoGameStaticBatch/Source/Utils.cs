@@ -1,8 +1,6 @@
-﻿/// <summary>
-/// Misc utilities used internally.
-/// Author: Ronen Ness.
-/// Since: 2018.
-/// </summary>
+﻿// Misc utilities used internally.
+// Author: Ronen Ness.
+// Since: 2018.
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 

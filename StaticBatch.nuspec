@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+	<id>MonoGame.StaticBatch</id>
+	<version>1.0.0.0</version>
+	<authors>Ronen Ness</authors>
+	<owners>RonenNess</owners>
+	<title>MonoGame.StaticBatch</title>
+	<summary>Helper class to batch together static sprites and boost performance.</summary>
+	<licenseUrl>https://github.com/RonenNess/MonoGame.StaticBatch/blob/master/LICENSE</licenseUrl>
+	<projectUrl>https://github.com/RonenNess/MonoGame.StaticBatch</projectUrl>
+	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<releaseNotes>First stable release.</releaseNotes>
+	<description>Boost performance and reduce draw calls by batching multiple sprites together on a grid of render targets.</description>
+	<tags>monogame batch optimization static rendertarget</tags>
+	<dependencies>
+	</dependencies>
+  </metadata>
+  <files>
+	<file src="MonoGameStaticBatch\MonoGameStaticBatch\bin\DesktopGL\AnyCPU\Release\MonoGameStaticBatch.dll" target="lib\staticbatch\MonoGameStaticBatch.dll"/>
+  </files>
+</package>
