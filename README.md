@@ -126,3 +126,5 @@ Sprites used in demo are from the following sources:
 
 
 # License
+
+`MonoGame.StaticBatch` is distributed under the permissive MIT license and is absolutely free to use for any purpose.
